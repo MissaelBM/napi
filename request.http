@@ -1,0 +1,7 @@
+POST    http://localhost:3000/api/rol 
+Content-Type: application/json 
+
+{
+  "nombre": "Empresa",
+  "idcreador": 1
+}

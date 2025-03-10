@@ -34,7 +34,7 @@ module.exports = (connection) => {
         },
 
         permiso: async (req, res) => {
-            const { nombre, idcreador, idactualizacion, fechacreacion, fechaactualizacion } = req.body;
+            const { nombre, idcreador } = req.body;
 
             try {
                 const valoresPermitidos = ['Crear', 'Consultar', 'Actualizar', 'Eliminar'];
@@ -45,7 +45,7 @@ module.exports = (connection) => {
 
                 const [result] = await connection.promise().query(
                     'INSERT INTO permiso ( nombre,  idcreador, idactualizacion, fechacreacion, fechaactualizacion, eliminado) VALUES (?, ?, ?, ?, ?, ?)',
-                    [nombre, idcreador, idactualizacion, fechacreacion, fechaactualizacion, 0]
+                    [nombre, idcreador, new Date(), null, null, 0]
                 );
 
                 res.status(201).json({ message: 'Permiso registrada', promId: result.insertId });

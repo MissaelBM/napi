@@ -4,7 +4,7 @@ require('dotenv').config();
 module.exports = (connection) => {
   return {
     usuario: async (req, res) => {
-      const { rol_idrol, email, contraseña, fechacreacion, fechaactualizacion, idcreador, idactualizacion } = req.body;
+      const { rol_idrol, email, contraseña,  idcreador } = req.body;
 
       try {
         const [rolResult] = await connection.promise().query(
@@ -20,7 +20,7 @@ module.exports = (connection) => {
 
         const [result] = await connection.promise().query(
           'INSERT INTO usuario (rol_idrol, email, contraseña, fechacreacion, fechaactualizacion, idcreador, idactualizacion, eliminado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-          [rol_idrol, email, hashedPasswordBinary, fechacreacion, fechaactualizacion, idcreador, idactualizacion, 0]
+          [rol_idrol, email, hashedPasswordBinary, new Date(), null, idcreador, null, 0]
         );
 
         res.status(201).json({ message: 'Usuario registrado', userId: result.insertId });

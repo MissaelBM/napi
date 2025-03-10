@@ -11,12 +11,12 @@ module.exports = (connection) => {
     },
 
     rol: async (req, res) => {
-      const { nombre, idcreador, idactualizacion, fechacreacion, fechaactualizacion} = req.body;
+      const { nombre, idcreador} = req.body;
 
       try {
         const [result] = await connection.promise().query(
           'INSERT INTO rol (nombre, idcreador, idactualizacion, fechacreacion, fechaactualizacion, eliminado) VALUES (?, ?, ?, ?, ?, ?)',
-          [nombre, idcreador, idactualizacion, fechacreacion, fechaactualizacion, 0] 
+          [nombre, idcreador, null, new Date(), null, 0] 
         );
 
         res.status(201).json({ message: 'Rol registrado', rolId: result.insertId });

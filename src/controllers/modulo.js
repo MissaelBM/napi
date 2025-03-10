@@ -11,7 +11,7 @@ module.exports = (connection) => {
         },
 
         modulo: async (req, res) => {
-            const { permiso_idpermiso, rol_idrol, idcreador, idactualizacion, fechacreacion, fechaactualizacion } = req.body;
+            const { permiso_idpermiso, rol_idrol, idcreador } = req.body;
         
             try {
                
@@ -37,7 +37,7 @@ module.exports = (connection) => {
                 
                 const [result] = await connection.promise().query(
                     'INSERT INTO modulo (permiso_idpermiso, rol_idrol, idcreador, idactualizacion, fechacreacion, fechaactualizacion, eliminado) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                    [permiso_idpermiso, rol_idrol, idcreador, idactualizacion, fechacreacion, fechaactualizacion, 0]
+                    [permiso_idpermiso, rol_idrol, idcreador, null, new Date(), null, 0]
                 );
         
                 res.status(201).json({ message: 'Módulo registrado', moduloId: result.insertId });
