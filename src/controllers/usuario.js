@@ -145,7 +145,7 @@ module.exports = (connection) => {
         console.log('Contraseña ingresada:', JSON.stringify(contraseña));
 
         if (contraseña.trim() !== storedPassword.trim()) {
-          return res.status(401).json({ message: 'Correo o contraseña incorrectos' });
+          return res.status(401).json({ message: 'Correo o contraseña incorrectos.' });
         }
 
         const accessToken = jwt.sign(
@@ -160,13 +160,18 @@ module.exports = (connection) => {
           { expiresIn: '7d' }
         );
 
-        const fechaexpiracion = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); 
+        const fechaexpiracion = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+        const fechacreacion = new Date();
 
-        const fechacreacion =new Date(Date.now());
-        await connection.promise().query(
-          'INSERT INTO refreshtoken (usuario_idusuario, token, fechaexpiracion, fechacreacion, eliminado) VALUES (?, ?, ?, ?, ?)',
-          [user.idusuario, refreshToken, fechaexpiracion, fechacreacion, 0]
-        );
+        try {
+            await connection.promise().query(
+                'INSERT INTO refreshtoken (usuario_idusuario, token, fechaexpiracion, fechacreacion, eliminado) VALUES (?, ?, ?, ?, ?)',
+                [user.idusuario, refreshToken, fechaexpiracion, fechacreacion, 0]
+            );
+        } catch (insertError) {
+            console.error('Error al guardar el refresh token:', insertError);
+            return res.status(500).json({ message: 'Error al guardar el token' });
+        }
 
         res.json({
           message: 'Login exitoso',
