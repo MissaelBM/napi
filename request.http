@@ -1,7 +1,7 @@
-POST    http://localhost:3000/api/rol 
+POST    http://localhost:3000/api/usuario/login 
 Content-Type: application/json 
 
 {
-  "nombre": "Empresa",
-  "idcreador": 1
+  "email": "usuario@ejemplo.com",
+  "contraseña": "contra123"
 }

@@ -127,7 +127,7 @@ module.exports = (connection) => {
 
       try {
         const [rows] = await connection.promise().query(
-          'SELECT idusuario, nombre, rol_idrol, email, contraseña FROM usuario INNER join rol on usuario.rol_idrol = rol.idrol WHERE email = ? AND usuario.eliminado = 0',
+          'SELECT idusuario, cliente.nombre as nombrecliente, rol.nombre, rol_idrol, email, contraseña FROM usuario INNER join rol on usuario.rol_idrol = rol.idrol INNER join cliente on cliente.usuario_idusuario= usuario.idusuario WHERE email = ?  AND usuario.eliminado = 0',
           [email]
         );
 
@@ -149,13 +149,13 @@ module.exports = (connection) => {
         }
 
         const accessToken = jwt.sign(
-          { idusuario: user.idusuario, email: user.email, rol_idrol: user.rol_idrol, nombre:user.nombre },
+          { idusuario: user.idusuario, email: user.email, rol_idrol: user.rol_idrol, nombrecliente: user.nombrecliente, rol: user.nombre },
           process.env.ACCESS_TOKEN_SECRET,
           { expiresIn: '15m' }
         );
-
+        
         const refreshToken = jwt.sign(
-          { idusuario: user.idusuario, email: user.email, rol_idrol: user.rol_idrol, nombre:user.nombre},
+          { idusuario: user.idusuario, email: user.email, rol_idrol: user.rol_idrol, nombrecliente: user.nombrecliente, rol: user.nombre },
           process.env.REFRESH_TOKEN_SECRET,
           { expiresIn: '7d' }
         );
@@ -176,7 +176,8 @@ module.exports = (connection) => {
             idusuario: user.idusuario,
             email: user.email,
             rol_idrol: user.rol_idrol,
-            nombre:user.nombre
+            nombrecliente: user.nombrecliente,
+            rol: user.nombre
           }
         });
 
