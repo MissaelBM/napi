@@ -73,7 +73,7 @@ module.exports = (connection) => {
 
       
       if (fechaactualizacion) {
-          updates.push('fechaactualizacion = ?');
+        updates.push('fechaactualizacion = NOW()');
           params.push(fechaactualizacion);
       }
         if (updates.length === 0) {
