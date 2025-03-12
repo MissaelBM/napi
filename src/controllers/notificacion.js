@@ -1,9 +1,7 @@
 module.exports = (connection) => {
   return {
       consultar: async (req, res) => {
-          try {
-
-              
+          try {             
               const [rows] = await connection.promise().query('SELECT * FROM notificacion WHERE eliminado = ?', [0]);
               res.status(200).json(rows);
           } catch (error) {
@@ -54,7 +52,7 @@ module.exports = (connection) => {
               
               const [result] = await connection.promise().query(
                   'INSERT INTO notificacion (cliente_idcliente, promocion_idpromocion, fechayhora, leido, eliminado) VALUES (?, ?, ?, ?, ?)',
-                  [cliente_idcliente, promocion_idpromocion, fechayhora, leido, 1]
+                  [cliente_idcliente, promocion_idpromocion, fechayhora, leido, 0]
               );
 
               res.status(201).json({ message: 'Notificación registrada', notificacionId: result.insertId });
