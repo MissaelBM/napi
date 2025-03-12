@@ -174,14 +174,13 @@ module.exports = (connection) => {
         }
 
         res.json({
-          message: 'Login exitoso',
           accessToken,
           refreshToken,
           user: {
             idusuario: user.idusuario,
             email: user.email,
-            rol_idrol: user.rol_idrol,
             nombrecliente: user.nombrecliente,
+            rol_idrol: user.rol_idrol,
             rol: user.nombre
           }
         });
@@ -254,7 +253,7 @@ module.exports = (connection) => {
     
       try {
         const [result] = await connection.promise().query(
-          'UPDATE refreshtoken SET eliminado = 1 WHERE token = ?',
+          'DELETE FROM refresh_tokens WHERE token = ?',
           [refreshToken]
         );
     
