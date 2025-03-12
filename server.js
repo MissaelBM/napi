@@ -19,6 +19,7 @@ const tarjetaRoutes = require('./src/routes/tarjeta');
 const listadecategoriaRoutes = require('./src/routes/listadecategoria');
 const app = express();
 const port = process.env.PORT || 8080;
+const cors = require('cors');
 
 app.use(bodyParser.json());
 
@@ -32,6 +33,11 @@ const pool = mysql.createPool({
   connectionLimit: 10,
   queueLimit: 0
 });
+app.use(cors({
+  origin: 'https://napi-production.up.railway.app', 
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 pool.getConnection((err, connection) => {
   if (err) {
