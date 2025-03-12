@@ -1,7 +1,3 @@
-POST    http://localhost:3000/api/rol 
+GET     http://localhost:3000/api/movimiento 
 Content-Type: application/json 
 
-{
-  "nombre": "Empresa",
-  "idcreador": 1
-}
