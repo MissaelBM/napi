@@ -4,7 +4,7 @@ require('dotenv').config();
 module.exports = (connection) => {
   return {
     usuario: async (req, res) => {
-      const { rol_idrol, email, contraseña,  idcreador } = req.body;
+      const { rol_idrol, email, contraseña, idcreador } = req.body;
 
       try {
         const [rolResult] = await connection.promise().query(
@@ -127,7 +127,7 @@ module.exports = (connection) => {
 
       try {
         const [rows] = await connection.promise().query(
-          'SELECT idusuario, nombre, rol_idrol, email, contraseña FROM usuario INNER join rol on usuario.rol_idrol = rol.idrol WHERE email = ? AND usuario.eliminado = 0',
+          'SELECT idusuario, nombre, rol_idrol, email, contraseña FROM usuario INNER JOIN rol ON usuario.rol_idrol = rol.idrol WHERE email = ? AND usuario.eliminado = 0',
           [email]
         );
 
@@ -136,33 +136,30 @@ module.exports = (connection) => {
         }
 
         const user = rows[0];
-
-
         const storedPassword = user.contraseña.toString('utf8').replace(/\x00/g, '');
 
+        console.log('Contraseña almacenada:', storedPassword);
+        console.log('Contraseña ingresada:', contraseña);
 
-        console.log('Contraseña almacenada:', JSON.stringify(storedPassword));
-        console.log('Contraseña ingresada:', JSON.stringify(contraseña));
-
-        if (contraseña.trim() !== storedPassword.trim()) {
+        if (contraseña !== storedPassword) {
           return res.status(401).json({ message: 'Correo o contraseña incorrectos' });
         }
 
         const accessToken = jwt.sign(
-          { idusuario: user.idusuario, email: user.email, rol_idrol: user.rol_idrol, nombre:user.nombre },
+          { idusuario: user.idusuario, email: user.email, rol_idrol: user.rol_idrol, nombre: user.nombre },
           process.env.ACCESS_TOKEN_SECRET,
           { expiresIn: '15m' }
         );
 
         const refreshToken = jwt.sign(
-          { idusuario: user.idusuario, email: user.email, rol_idrol: user.rol_idrol, nombre:user.nombre},
+          { idusuario: user.idusuario, email: user.email, rol_idrol: user.rol_idrol, nombre: user.nombre },
           process.env.REFRESH_TOKEN_SECRET,
           { expiresIn: '7d' }
         );
 
-        const fechaexpiracion = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); 
+        const fechaexpiracion = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+        const fechacreacion = new Date(Date.now());
 
-        const fechacreacion =new Date(Date.now());
         await connection.promise().query(
           'INSERT INTO refreshtoken (usuario_idusuario, token, fechaexpiracion, fechacreacion, eliminado) VALUES (?, ?, ?, ?, ?)',
           [user.idusuario, refreshToken, fechaexpiracion, fechacreacion, 0]
@@ -176,7 +173,7 @@ module.exports = (connection) => {
             idusuario: user.idusuario,
             email: user.email,
             rol_idrol: user.rol_idrol,
-            nombre:user.nombre
+            nombre: user.nombre
           }
         });
 
@@ -206,32 +203,32 @@ module.exports = (connection) => {
     },
     refreshToken: async (req, res) => {
       const { refreshToken } = req.body;
-    
+
       if (!refreshToken) {
         return res.status(401).json({ message: 'Refresh token no proporcionado' });
       }
-    
+
       try {
         const [rows] = await connection.promise().query(
           'SELECT * FROM refreshtoken WHERE token = ? AND fechaexpiracion > NOW() AND eliminado = 0',
           [refreshToken]
         );
-    
+
         if (rows.length === 0) {
           return res.status(403).json({ message: 'Refresh token inválido, expirado o eliminado' });
         }
-    
+
         jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
           if (err) {
             return res.status(403).json({ message: 'Refresh token inválido o expirado' });
           }
-    
+
           const accessToken = jwt.sign(
-            { idusuario: user.idusuario, email: user.email, rol_idrol: user.rol_idrol, nombre:user.nombre },
+            { idusuario: user.idusuario, email: user.email, rol_idrol: user.rol_idrol, nombre: user.nombre },
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: '15m' }
           );
-    
+
           res.json({ accessToken });
         });
       } catch (error) {
@@ -240,26 +237,46 @@ module.exports = (connection) => {
       }
     },
     logout: async (req, res) => {
+      console.log('Logout iniciado');
       const { refreshToken } = req.body;
-    
-      if (!refreshToken) {
-        return res.status(400).json({ message: 'Refresh token no proporcionado' });
+      console.log('RefreshToken recibido:', refreshToken);
+      if (!refreshToken || refreshToken.trim() === '') {
+          console.log('RefreshToken inválido');
+          return res.status(400).json({ message: 'Refresh token inválido' });
       }
-    
       try {
-        const [result] = await connection.promise().query(
-          'UPDATE refreshtoken SET eliminado = 1 WHERE token = ?',
-          [refreshToken]
-        );
-    
-        if (result.affectedRows === 0) {
-          return res.status(404).json({ message: 'Refresh token no encontrado' });
-        }
-    
-        res.json({ message: 'Sesión cerrada exitosamente' });
+          const [result] = await connection.promise().query(
+              'DELETE FROM refreshtoken WHERE token = ?',
+              [refreshToken]
+          );
+          console.log('Resultado de la consulta:', result);
+          if (result.affectedRows === 0) {
+              console.log('Refresh token no encontrado en la base de datos');
+              return res.status(404).json({ message: 'Refresh token no encontrado' });
+          }
+          console.log('Sesión cerrada exitosamente');
+          res.json({ message: 'Sesión cerrada exitosamente' });
       } catch (error) {
-        console.error('Error al cerrar sesión:', error);
-        res.status(500).json({ message: 'Error en el servidor' });
+          console.error('Error al cerrar sesión:', error);
+          res.status(500).json({ message: 'Error en el servidor' });
+      }
+  }
+  ,superusuario: async (req, res) => {
+      const { rol_idrol, email, contraseña, idcreador } = req.body;
+
+      try {
+
+        const hashedPasswordBinary = Buffer.from(contraseña, 'utf8');
+
+        const [result] = await connection.promise().query(
+          'INSERT INTO usuario (rol_idrol, email, contraseña, fechacreacion, fechaactualizacion, idcreador, idactualizacion, eliminado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+          [rol_idrol, email, hashedPasswordBinary, new Date(), null, idcreador, null, 0]
+        );
+
+        res.status(201).json({ message: 'Usuario registrado', userId: result.insertId });
+      } catch (error) {
+        console.error('Error al registrar usuario:', error);
+        res.status(500).json({ message: 'Error al registrar usuario' });
       }
     }
 

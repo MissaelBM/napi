@@ -11,12 +11,12 @@ module.exports = (connection) => {
     },
 
     rol: async (req, res) => {
-      const { nombre, idcreador} = req.body;
+      const { nombre, idcreador } = req.body;
 
       try {
         const [result] = await connection.promise().query(
           'INSERT INTO rol (nombre, idcreador, idactualizacion, fechacreacion, fechaactualizacion, eliminado) VALUES (?, ?, ?, ?, ?, ?)',
-          [nombre, idcreador, null, new Date(), null, 0] 
+          [nombre, idcreador, null, new Date(), null, 0]
         );
 
         res.status(201).json({ message: 'Rol registrado', rolId: result.insertId });
@@ -59,23 +59,23 @@ module.exports = (connection) => {
         if (idcreador) {
           updates.push('idcreador = ?');
           params.push(idcreador);
-      }
+        }
 
-      if (idactualizacion) {
+        if (idactualizacion) {
           updates.push('idactualizacion = ?');
           params.push(idactualizacion);
-      }
+        }
 
-      if (fechacreacion) {
+        if (fechacreacion) {
           updates.push('fechacreacion = ?');
           params.push(fechacreacion);
-      }
+        }
 
-      
-      if (fechaactualizacion) {
+
+        if (fechaactualizacion) {
           updates.push('fechaactualizacion = ?');
           params.push(fechaactualizacion);
-      }
+        }
         if (updates.length === 0) {
           return res.status(400).json({ message: 'Sin información' });
         }

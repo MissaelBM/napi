@@ -1,3 +1,8 @@
-GET     http://localhost:3000/api/movimiento 
+POST  https://napi-production.up.railway.app/api/usuario/logout
 Content-Type: application/json 
+
+{
+   "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZHVzdWFyaW8iOjEsImVtYWlsIjoidXN1YXJpb0BlamVtcGxvLmNvbSIsInJvbF9pZHJvbCI6MSwibm9tYnJlY2xpZW50ZSI6Ikp1YW4gUMOpcmV6Iiwicm9sIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc0MTg0MjQ2OCwiZXhwIjoxNzQyNDQ3MjY4fQ.B0BnwzfMLhx850-2kodck8HW40yGY65OV5TsnoYR10o"
+}
+
 
