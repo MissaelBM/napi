@@ -127,9 +127,13 @@ module.exports = (connection) => {
 
       try {
         const [rows] = await connection.promise().query(
-          'SELECT idusuario, nombre, rol_idrol, email, contraseña FROM usuario INNER JOIN rol ON usuario.rol_idrol = rol.idrol WHERE email = ? AND usuario.eliminado = 0',
+          `SELECT idusuario, cliente.nombre as nombrecliente, rol.nombre, rol_idrol, email, contraseña 
+           FROM usuario 
+           INNER JOIN rol ON usuario.rol_idrol = rol.idrol 
+           INNER JOIN cliente ON cliente.usuario_idusuario = usuario.idusuario 
+           WHERE email = ? AND usuario.eliminado = 0`,
           [email]
-        );
+      );
 
         if (rows.length === 0) {
           return res.status(401).json({ message: 'Correo o contraseña incorrectos' });
@@ -146,16 +150,17 @@ module.exports = (connection) => {
         }
 
         const accessToken = jwt.sign(
-          { idusuario: user.idusuario, email: user.email, rol_idrol: user.rol_idrol, nombre: user.nombre },
+          { idusuario: user.idusuario, email: user.email, rol_idrol: user.rol_idrol, nombrecliente: user.nombrecliente, rol: user.nombre },
           process.env.ACCESS_TOKEN_SECRET,
           { expiresIn: '15m' }
         );
         
         const refreshToken = jwt.sign(
-          { idusuario: user.idusuario, email: user.email, rol_idrol: user.rol_idrol, nombre: user.nombre },
+          { idusuario: user.idusuario, email: user.email, rol_idrol: user.rol_idrol, nombrecliente: user.nombrecliente, rol: user.nombre },
           process.env.REFRESH_TOKEN_SECRET,
           { expiresIn: '7d' }
         );
+        
 
         const fechaexpiracion = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
         const fechacreacion = new Date(Date.now());
@@ -166,14 +171,15 @@ module.exports = (connection) => {
         );
 
         res.json({
+          message: 'Login exitoso',
           accessToken,
           refreshToken,
           user: {
             idusuario: user.idusuario,
-            email: user.email,
             nombrecliente: user.nombrecliente,
+            email: user.email,
             rol_idrol: user.rol_idrol,
-            nombre: user.nombre
+            rol: user.nombre
           }
         });
 
