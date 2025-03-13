@@ -171,7 +171,6 @@ module.exports = (connection) => {
         );
 
         res.json({
-          message: 'Login exitoso',
           accessToken,
           refreshToken,
           user: {
