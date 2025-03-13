@@ -34,7 +34,7 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 app.use(cors({
-  origin: 'https://napi-production.up.railway.app', 
+  origin: '*', 
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
