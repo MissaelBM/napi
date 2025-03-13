@@ -5,24 +5,44 @@ module.exports = (connection) => {
   return {
     usuario: async (req, res) => {
       const { rol_idrol, email, contraseña, idcreador } = req.body;
-
+    
       try {
+        
         const [rolResult] = await connection.promise().query(
-          'SELECT idrol FROM rol WHERE idrol = ?',
+          'SELECT nombre FROM rol WHERE idrol = ?',
           [rol_idrol]
         );
-
+    
         if (rolResult.length === 0) {
           return res.status(400).json({ message: 'El rol especificado no existe' });
         }
-
+    
+        const nombreRol = rolResult[0].nombre;
+    
+       
+        const [creadorRolResult] = await connection.promise().query(
+          'SELECT r.nombre FROM usuario u JOIN rol r ON u.rol_idrol = r.idrol WHERE u.idusuario = ?',
+          [idcreador]
+        );
+    
+        if (creadorRolResult.length === 0) {
+          return res.status(400).json({ message: 'El creador especificado no existe' });
+        }
+    
+        const nombreRolCreador = creadorRolResult[0].nombre;
+    
+        
+        if (nombreRol === 'Superusuario' && nombreRolCreador !== 'Superusuario') {
+          return res.status(403).json({ message: 'Solo los superusuarios pueden crear Superusuarios' });
+        }
+    
         const hashedPasswordBinary = Buffer.from(contraseña, 'utf8');
-
+    
         const [result] = await connection.promise().query(
           'INSERT INTO usuario (rol_idrol, email, contraseña, fechacreacion, fechaactualizacion, idcreador, idactualizacion, eliminado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
           [rol_idrol, email, hashedPasswordBinary, new Date(), null, idcreador, null, 0]
         );
-
+    
         res.status(201).json({ message: 'Usuario registrado', userId: result.insertId });
       } catch (error) {
         console.error('Error al registrar usuario:', error);
@@ -260,7 +280,8 @@ module.exports = (connection) => {
               return res.status(404).json({ message: 'Refresh token no encontrado' });
           }
           console.log('Sesión cerrada exitosamente');
-          res.json({ message: 'Sesión cerrada exitosamente' });
+          
+          return res.json({ exito: true });
       } catch (error) {
           console.error('Error al cerrar sesión:', error);
           res.status(500).json({ message: 'Error en el servidor' });
