@@ -288,23 +288,33 @@ module.exports = (connection) => {
       }
   }
   ,superusuario: async (req, res) => {
-      const { rol_idrol, email, contraseña, idcreador } = req.body;
+    const { email, contraseña, idcreador } = req.body;
 
-      try {
+    try {
+        
+        const [roles] = await connection.promise().query(
+            'SELECT idrol FROM rol WHERE nombre = ?',
+            ['Superusuario']
+        );
 
+        if (roles.length === 0) {
+            return res.status(400).json({ message: 'El rol Superusuario no existe' });
+        }
+
+        const rol_idrol = roles[0].idrol;
         const hashedPasswordBinary = Buffer.from(contraseña, 'utf8');
 
         const [result] = await connection.promise().query(
-          'INSERT INTO usuario (rol_idrol, email, contraseña, fechacreacion, fechaactualizacion, idcreador, idactualizacion, eliminado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-          [rol_idrol, email, hashedPasswordBinary, new Date(), null, idcreador, null, 0]
+            'INSERT INTO usuario (rol_idrol, email, contraseña, fechacreacion, fechaactualizacion, idcreador, idactualizacion, eliminado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [rol_idrol, email, hashedPasswordBinary, new Date(), null, idcreador, null, 0]
         );
 
         res.status(201).json({ message: 'Usuario registrado', userId: result.insertId });
-      } catch (error) {
+    } catch (error) {
         console.error('Error al registrar usuario:', error);
         res.status(500).json({ message: 'Error al registrar usuario' });
-      }
     }
+}
 
 
 
