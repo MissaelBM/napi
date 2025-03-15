@@ -19,9 +19,10 @@ const authenticateToken = (roles = []) => {
       }
 
       
-      if (roles.length > 0 && !roles.includes(user.nombre)) {
+      if (roles.length > 0 && !roles.includes(user.rol)) { 
         return res.status(403).json({ message: 'Acceso denegado: No tienes permisos suficientes' });
       }
+      
 
       
       req.user = user;
