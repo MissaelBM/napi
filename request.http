@@ -1,6 +1,6 @@
 ### 2. Obtener lista de usuarios (Ruta protegida)
 GET http://localhost:3000/api/rol
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZHVzdWFyaW8iOjEsImVtYWlsIjoidXN1YXJpb0BlamVtcGxvLmNvbSIsInJvbF9pZHJvbCI6MSwibm9tYnJlY2xpZW50ZSI6Ikp1YW4gUMOpcmV6Iiwicm9sIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc0MjAwNDEwMSwiZXhwIjoxNzQyMDA1MDAxfQ.WTV5P1_MkyCoYIt03rzVEkdJ8JwuiWy4yzo9RpmgKiA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZHVzdWFyaW8iOjEsImVtYWlsIjoidXN1YXJpb0BlamVtcGxvLmNvbSIsInJvbF9pZHJvbCI6MSwibm9tYnJlY2xpZW50ZSI6Ikp1YW4gUMOpcmV6Iiwicm9sIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc0MjAyMzYxNSwiZXhwIjoxNzQyMDI0NTE1fQ.TSXvd1i7awFGwdF2diQt-zERlffHd3ObPHHOa5QuND8
 Content-Type: application/json
 
 ### 1. Iniciar sesión (Ruta pública)
@@ -12,3 +12,21 @@ Content-Type: application/json
   "contraseña": "contra123"
 }
 
+### 4. Cerrar sesión (Ruta pública)
+POST https://napi-production.up.railway.app/api/usuario/logout
+Content-Type: application/json
+
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZHVzdWFyaW8iOjEsImVtYWlsIjoidXN1YXJpb0BlamVtcGxvLmNvbSIsInJvbF9pZHJvbCI6MSwibm9tYnJlY2xpZW50ZSI6Ikp1YW4gUMOpcmV6Iiwicm9sIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc0MjAyMzYxNSwiZXhwIjoxNzQyNjI4NDE1fQ.oShyAtCfBr77TgROK7qIyDN7BTFvsP6T43DPTmjM0V0"
+}
+
+### 1. Iniciar sesión (Ruta pública)
+POST https://napi-production.up.railway.app/api/usuario
+Content-Type: application/json
+
+{
+  "rol_idrol": 3,
+  "email": "usuario@super.com",
+  "contraseña": "contra987",
+  "idcreador": 1
+}

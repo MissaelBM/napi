@@ -22,7 +22,7 @@ module.exports = (connection) => {
        
         const [creadorRolResult] = await connection.promise().query(
           'SELECT r.nombre FROM usuario u JOIN rol r ON u.rol_idrol = r.idrol WHERE u.idusuario = ?',
-          [idcreador]
+          [rol_idrol]
         );
     
         if (creadorRolResult.length === 0) {
