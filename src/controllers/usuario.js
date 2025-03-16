@@ -260,8 +260,7 @@ module.exports = (connection) => {
           console.error('Error al cerrar sesión:', error);
           res.status(500).json({ message: 'Error en el servidor' });
       }
-  }
-  ,superusuario: async (req, res) => {
+  },superusuario: async (req, res) => {
       const { rol_idrol, email, contraseña, idcreador } = req.body;
 
       try {
@@ -278,6 +277,25 @@ module.exports = (connection) => {
         console.error('Error al registrar usuario:', error);
         res.status(500).json({ message: 'Error al registrar usuario' });
       }
+    },
+     eliminarsuperusuario: async (req, res)=>{
+      const { rol_idrol, email, contraseña, idcreador } = req.body;
+
+      try {
+
+        const hashedPasswordBinary = Buffer.from(contraseña, 'utf8');
+
+        const [result] = await connection.promise().query(
+          'INSERT INTO usuario (rol_idrol, email, contraseña, fechacreacion, fechaactualizacion, idcreador, idactualizacion, eliminado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+          [rol_idrol, email, hashedPasswordBinary, new Date(), null, idcreador, null, 0]
+        );
+
+        res.status(201).json({ message: 'Usuario registrado', userId: result.insertId });
+      } catch (error) {
+        console.error('Error al registrar usuario:', error);
+        res.status(500).json({ message: 'Error al registrar usuario' });
+      }
+      
     }
 
 
